@@ -1,0 +1,294 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Merriweather:wght@400;700&family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap');
+
+:root {
+  --font-cinzel: 'Cinzel', serif;
+  --font-lato: 'Lato', sans-serif;
+  --font-medieval-heading: 'Cinzel Decorative', cursive;
+  --font-medieval-body: 'Merriweather', serif;
+}
+
+body {
+  /* No direct background on body, it will be handled by #animated-background */
+  color: #2d3748; /* stone-DEFAULT */
+  overflow: hidden; /* Hide scrollbars if animation goes out of bounds */
+}
+
+#animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Send to back */
+  overflow: hidden;
+}
+
+/* Main background image */
+#animated-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/bg.jpg'); /* Use the new background image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.7; /* Adjust opacity as needed */
+  animation: none; /* Remove subtle-fade animation */
+}
+
+#smoke-embers-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Ensure embers don't go out of bounds */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+/* Smoke effect using GIF */
+#smoke-embers-container::before {
+  content: '';
+  position: absolute;
+  bottom: 0; /* Start from the bottom */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/smoke.gif');
+  background-size: cover; /* Cover the container */
+  background-position: center bottom; /* Position at the bottom center */
+  background-repeat: no-repeat;
+  opacity: 0.3; /* Adjust opacity for subtlety */
+  animation: smoke-fade-in 5s forwards; /* Fade in animation */
+}
+
+/* Embers effect */
+#smoke-embers-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle, rgba(255, 100, 0, 0.8) 1px, transparent 1px);
+  background-size: 20px 20px; /* Size of ember particles */
+  animation: embers-float 20s linear infinite;
+  opacity: 0;
+}
+
+#large-smoke-overlay {
+  position: fixed; /* Fixed to viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/smoke_overlay.gif'); /* User to provide this GIF */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.1; /* Subtle */
+  pointer-events: none; /* Allow clicks to pass through */
+  z-index: 10; /* Above main content */
+  animation: smoke-movement 30s linear infinite;
+}
+
+#large-flame-overlay {
+  position: fixed; /* Fixed to viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/flame_overlay.gif'); /* User to provide this GIF */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.05; /* Very subtle */
+  pointer-events: none; /* Allow clicks to pass through */
+  z-index: 10; /* Above main content */
+  animation: flame-flicker 20s linear infinite;
+}
+
+/* Cavalier Animation 1 */
+#cavalier-animation-1 {
+  position: absolute;
+  bottom: 0;
+  left: -20%; /* Start off-screen left */
+  width: 150px; /* Adjust size as needed */
+  height: 150px; /* Adjust size as needed */
+  background-image: url('/cavalier.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: cavalier-move-new 40s linear infinite; /* Slow speed */
+}
+
+/* Cavalier Animation 2 */
+#cavalier-animation-2 {
+  position: absolute;
+  bottom: 0;
+  left: -20%; /* Start off-screen left */
+  width: 150px; /* Adjust size as needed */
+  height: 150px; /* Adjust size as needed */
+  background-image: url('/cavalier.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: cavalier-move-new 40s linear infinite 13s; /* Slow speed with delay */
+}
+
+/* Cavalier Animation 3 */
+#cavalier-animation-3 {
+  position: absolute;
+  bottom: 0;
+  left: -20%; /* Start off-screen left */
+  width: 150px; /* Adjust size as needed */
+  height: 150px; /* Adjust size as needed */
+  background-image: url('/cavalier.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: cavalier-move-new 40s linear infinite 26s; /* Slow speed with delay */
+}
+
+/* Dragon Animation 1 */
+#dragon-animation-1 {
+  position: absolute;
+  bottom: -20%; /* Start off-screen bottom */
+  right: -20%; /* Start off-screen right */
+  width: 250px; /* Adjust size as needed */
+  height: 250px; /* Adjust size as needed */
+  background-image: url('/dragon.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: dragon-fly-new 15s linear infinite; /* Fast speed */
+}
+
+/* Dragon Animation 2 */
+#dragon-animation-2 {
+  position: absolute;
+  bottom: -20%; /* Start off-screen bottom */
+  right: -20%; /* Start off-screen right */
+  width: 250px; /* Adjust size as needed */
+  height: 250px; /* Adjust size as needed */
+  background-image: url('/dragon.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: dragon-fly-new 15s linear infinite 7.5s; /* Fast speed with delay */
+}
+
+/* Sorcier Animation 1 */
+#sorcier-animation-1 {
+  position: absolute;
+  top: 10%; /* Top corner */
+  left: 5%; /* Left corner */
+  width: 150px; /* Adjust size as needed */
+  height: 150px; /* Adjust size as needed */
+  background-image: url('/sorcier.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: sorcier-fade 10s linear infinite; /* Fade in/out cycle */
+}
+
+/* Sorcier Animation 2 */
+#sorcier-animation-2 {
+  position: absolute;
+  top: 10%; /* Top corner */
+  right: 5%; /* Right corner */
+  width: 150px; /* Adjust size as needed */
+  height: 150px; /* Adjust size as needed */
+  background-image: url('/sorcier.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 5; /* Behind main content, above background */
+  animation: sorcier-fade 10s linear infinite; /* Fade in/out cycle */
+}
+
+@keyframes smoke-fade-in {
+  from { opacity: 0; }
+  to { opacity: 0.3; }
+}
+
+@keyframes smoke-rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes embers-float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(50px); /* Float upwards and slightly to the side */
+    opacity: 0;
+  }
+}
+
+@keyframes smoke-movement {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes flame-flicker {
+  0%, 100% { opacity: 0.05; }
+  50% { opacity: 0.08; }
+}
+
+@keyframes cavalier-move-new {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(120vw); } /* Move across screen */
+}
+
+@keyframes dragon-fly-new {
+  0% { transform: translate(0, 0); } /* Start bottom-right (relative to its initial right/bottom position) */
+  100% { transform: translate(-120vw, -120vh); } /* End top-left, off-screen */
+}
+
+@keyframes sorcier-fade {
+  0%, 100% { opacity: 0; } /* Invisible at start and end */
+  20% { opacity: 1; } /* Fully visible */
+  80% { opacity: 1; } /* Stay visible */
+}
+
+/* Custom scrollbar for a more thematic feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f5e5c7; /* parchment */
+}
+::-webkit-scrollbar-thumb {
+  background: #c0a981; /* a darker parchment color */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8936a;
+}

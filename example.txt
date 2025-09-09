@@ -1,0 +1,204 @@
+import React, { useState, useEffect } from "react";
+
+// MJ Master UI - React component (default export)
+// Usage:
+// - Set environment variable NEXT_PUBLIC_ORCHESTRATOR_URL to your orchestrator Function URL
+// - This component is framework-agnostic (works in Next.js, Vite + React, Create React App)
+// - Tailwind classes are used for styling
+
+export default function MJMasterUI() {
+  const ORCH_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || "";
+
+  const [sessionId, setSessionId] = useState("partie-1");
+  const [context, setContext] = useState("");
+  const [action, setAction] = useState("");
+  const [question, setQuestion] = useState("");
+  const [diceExpr, setDiceExpr] = useState("1d20+0");
+
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // optional: load initial history from orchestrator (if you implement a read endpoint)
+  }, [sessionId]);
+
+  async function callAgent(agent, payload) {
+    if (!ORCH_URL) {
+      setError("NEXT_PUBLIC_ORCHESTRATOR_URL n'est pas défini.");
+      return null;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const body = { agent, sessionId, ...payload };
+      const res = await fetch(ORCH_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || JSON.stringify(data));
+      }
+
+      // Append to local history
+      const entry = {
+        timestamp: new Date().toISOString(),
+        agent,
+        input: payload,
+        response: data.response || data,
+      };
+
+      setHistory((h) => [...h, entry]);
+      return data;
+    } catch (err) {
+      console.error(err);
+      setError(String(err.message || err));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onThrow() {
+    await callAgent("thrower", { expression: diceExpr });
+  }
+
+  async function onAskRule() {
+    if (!question.trim()) return setError("Entrez une question pour le rules-keeper.");
+    await callAgent("rules-keeper", { question: question.trim() });
+  }
+
+  async function onStory() {
+    if (!action.trim() && !context.trim()) return setError("Contexte ou action requis pour le storyteller.");
+    await callAgent("storyteller", { context: context.trim(), action: action.trim() });
+  }
+
+  function clearHistory() {
+    setHistory([]);
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6 font-sans">
+      <div className="max-w-5xl mx-auto">
+        <header className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Maître du Jeu IA — Interface</h1>
+          <div className="text-sm text-gray-600">
+            Orchestrateur: <span className="font-mono break-all">{ORCH_URL || "(NON CONFIGURÉ)"}</span>
+          </div>
+        </header>
+
+        <section className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium">Session ID</label>
+              <input
+                value={sessionId}
+                onChange={(e) => setSessionId(e.target.value)}
+                className="mt-1 block w-full rounded border-gray-200 shadow-sm p-2"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Contexte (optionnel)</label>
+              <input
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                placeholder="Ex: Le groupe entre dans une taverne sombre..."
+                className="mt-1 block w-full rounded border-gray-200 shadow-sm p-2"
+              />
+            </div>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h2 className="font-semibold mb-2">Lancer de dés (Thrower)</h2>
+            <input
+              value={diceExpr}
+              onChange={(e) => setDiceExpr(e.target.value)}
+              className="w-full rounded border-gray-200 p-2 mb-3"
+            />
+            <button
+              onClick={onThrow}
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 disabled:opacity-60"
+            >
+              Lancer
+            </button>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h2 className="font-semibold mb-2">Vérifier règle (Rules‑keeper)</h2>
+            <textarea
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              rows={4}
+              className="w-full rounded border-gray-200 p-2 mb-3"
+            />
+            <button
+              onClick={onAskRule}
+              disabled={loading}
+              className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:opacity-60"
+            >
+              Interroger
+            </button>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h2 className="font-semibold mb-2">Narration (Storyteller)</h2>
+            <textarea
+              value={action}
+              onChange={(e) => setAction(e.target.value)}
+              rows={4}
+              className="w-full rounded border-gray-200 p-2 mb-3"
+              placeholder="Ex: Le voleur tente de crocheter la serrure."
+            />
+            <button
+              onClick={onStory}
+              disabled={loading}
+              className="w-full bg-yellow-600 text-white p-2 rounded hover:bg-yellow-700 disabled:opacity-60"
+            >
+              Raconter la suite
+            </button>
+          </div>
+        </div>
+
+        <section className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Historique</h3>
+            <div>
+              <button onClick={clearHistory} className="text-sm text-red-600 hover:underline">Effacer</button>
+            </div>
+          </div>
+
+          {error && (
+            <div className="mb-3 p-2 bg-red-50 text-red-700 rounded">Erreur : {error}</div>
+          )}
+
+          <div className="space-y-3">
+            {history.length === 0 && <div className="text-sm text-gray-500">Aucune action pour l'instant.</div>}
+
+            {history.map((h, i) => (
+              <div key={i} className="p-3 border rounded">
+                <div className="text-xs text-gray-400 mb-1">{new Date(h.timestamp).toLocaleString()}</div>
+                <div className="flex items-start gap-3">
+                  <div className="font-mono text-sm bg-gray-100 p-1 rounded">{h.agent}</div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-700">Input: <span className="font-mono">{JSON.stringify(h.input)}</span></div>
+                    <div className="mt-2 text-sm text-gray-900">Response:</div>
+                    <pre className="mt-1 bg-gray-50 p-2 rounded text-sm overflow-auto">{JSON.stringify(h.response, null, 2)}</pre>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <footer className="text-center text-sm text-gray-500">MJ‑IA Web UI — connecte-toi à l'orchestrateur pour jouer.</footer>
+      </div>
+    </div>
+  );
+}
