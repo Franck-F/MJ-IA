@@ -38,6 +38,12 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Request failed with status ${res.status}: ${errorText}`);
+      }
+
       const data = await res.json();
 
       let agentResponseText = "Le Maître du Jeu est silencieux...";
